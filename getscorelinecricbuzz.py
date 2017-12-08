@@ -1,5 +1,11 @@
 from bs4 import BeautifulSoup as soup
 import urllib
+page_id= "140518209928971"
+access_token= "EAAZAMZCSZBejv0BABsaPsKmC9Mw5NaUUcxbdwZByRThE6GXfMx75VZAlOKJENOkvEJiWOGSuZA1fzwuXVdMrNWvxMxSsrKL86d5B5RZBEK6Y5TV3BaqNsqyxIiBDFvFlU4cHpHsglZASUWaVBun9ThP5fvobleaVNEbJFWuN6MyTGjd9WFGuNfspXbMWQ2S15bBjCfwZCLYdIGpIc1p5OcZCz6jy1c1BzoTREZD"
+import facebook
+#working_url
+nep_game="http://www.cricbuzz.com/live-cricket-scores/19294/uae-vs-nep-56th-match-icc-world-cricket-league-championship-2015-17"
+
 
 def get_data(url):
 	downloaded_file= urllib.urlopen(url)
@@ -13,13 +19,30 @@ def get_data(url):
 	list_thing = []
 	for commentary in live_commentary:
 		list_thing.append(commentary.get_text())
-	print list_thing[1]
+	return list_thing[1]
 	
 
 
-html_data =get_data("http://www.cricbuzz.com/live-cricket-scores/19305/mlyu19-vs-nplu19-group-a-acc-u-19-asia-cup-2017")
+def main():
+	cfg={
+	"page_id": page_id,
+	"access_token": access_token
+	}
 
-testing_other = get_data("http://www.cricbuzz.com/live-cricket-scores/19150/pakw-vs-nzw-4th-t20i-pakistan-women-v-new-zealand-women-in-uae-2017")
+	api = get_cpi(cfg)
+	msg=get_data(nep_game)
+	print msg
+	status=api.put_wall_post(msg)
 
-bagnl = get_data("http://www.cricbuzz.com/live-cricket-scores/19011/comilla-vs-chittagong-14th-match-bangladesh-premier-league-2017")
+def get_cpi(cfg):
+	graph= facebook.GraphAPI(cfg['access_token'])
+	resp = graph.get_object('me/accounts')
+	page_access_token= None
+	for page in resp['data']:
+		if page['id'] == cfg['page_id']:
+			page_access_token = page['access_token']
+		graph=facebook.GraphAPI(page_access_token)
+		return graph
 
+if __name__ == "__main__":
+	main()
